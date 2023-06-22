@@ -2,21 +2,21 @@ const main = async () => {
   const [owner, randomPerson] = await hre.ethers.getSigners();
   const waveContract = await hre.ethers.deployContract("WavePortal");
   await waveContract.waitForDeployment();
+
   console.log("Contract deployed to:", waveContract.target);
   console.log("Contract deployed by: ", owner.address);
 
+  // Test getTotalWaves() function
   await waveContract.getTotalWaves();
 
-  const wavetxn = await waveContract.wave();
+  // Test wave() function. This should Increase Wave Count by 1,
+  // In addition, waves = [{address, timestamp, message}]
+  const wavetxn = await waveContract.wave("hello world");
   await wavetxn.wait();
 
-  await waveContract.getTotalWaves();
-
-  const secondTxn = await waveContract.connect(randomPerson).wave();
-  console.log("This is the secondTxn object: ", secondTxn);
-  await secondTxn.wait();
-
-  await waveContract.getTotalWaves();
+  // Check waves[] to see if wave was successfully stored
+  const wavearr = await waveContract.getWaves();
+  console.log('ARRAY: ', wavearr);
 
 };
 
