@@ -18,6 +18,11 @@ const main = async () => {
   const wavearr = await waveContract.getWaves();
   console.log('ARRAY: ', wavearr);
 
+  const secondtxn = await waveContract.connect(randomPerson).wave("Bonjour!");
+  await secondtxn.wait();
+
+  const newWaveArray = await waveContract.getWaves();
+  console.log('UPDATED ARRAY: ', newWaveArray);
 };
 
 main().catch((error) => {
