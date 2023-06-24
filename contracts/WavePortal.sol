@@ -6,6 +6,7 @@ import "hardhat/console.sol";
 
 contract WavePortal {
     uint256 totalWaves;
+    uint256 private seed;
 
     constructor() payable {
         console.log("Contract was built...");
@@ -36,19 +37,21 @@ contract WavePortal {
         // and let it know that the smart contract has updated it's state
         emit newWave(msg.sender, block.timestamp, _message);
 
-        // Everyone who waves will receieve a prize amount of eth
-        uint256 prizeAmount = 0.0001 ether;
+        // There's a chance for a user that waved to receive some ether
+        // Generate a seed to determine if user gets a prize
+        seed = (block.timestamp * block.prevrandao) % 100;
+        if (seed <= 10) {
+            uint256 prizeAmount = 0.0001 ether;
+            // Check if we have enough funds to give out prize money
+            require(
+                address(this).balance >= prizeAmount,
+                "Contract balance too low to give prize amount"
+            );
 
-        // We must require that the balance of the contract is > than prize amount
-        // If contract has less than prize amount, print error message.
-        require(
-            prizeAmount <= address(this).balance,
-            "Trying to withdraw more money than the contract has."
-        );
-
-        // Require that the user who made wave() call is successful in receiving prize
-        (bool success, ) = (msg.sender).call{value: prizeAmount}("");
-        require(success, "Failed to withdraw money from the contract.");
+            // Attempt to give prize amount
+            (bool success, ) = (msg.sender).call{value: prizeAmount}("");
+            require(success, "Failed to withdraw money from contract.");
+        }
     }
 
     function getWaves() public view returns (Wave[] memory) {
