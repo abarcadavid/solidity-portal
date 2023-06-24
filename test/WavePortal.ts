@@ -9,7 +9,8 @@ describe("WavePortal Contract Tests", function() {
   async function deployWavePortalFixture() {
     const [owner, otherAccount] = await ethers.getSigners();
 
-    const wavePortalContract: any = await ethers.deployContract("WavePortal");
+    const wavePortalContractFactory = await ethers.getContractFactory("WavePortal");
+    const wavePortalContract: any = await wavePortalContractFactory.deploy({value: ethers.parseEther("0.1")});
     await wavePortalContract.waitForDeployment();
 
     return { wavePortalContract, owner, otherAccount }
@@ -18,9 +19,24 @@ describe("WavePortal Contract Tests", function() {
   describe("Deployment", function() {
     it("Should set the right owner", async function() {
       const { wavePortalContract, owner } = await loadFixture(deployWavePortalFixture);
-      expect(wavePortalContract.runner!.address).to.equal(owner.address);
+      const wavePortalContractOwner = wavePortalContract.runner.address
+      expect(wavePortalContractOwner).to.equal(owner.address);
     })
   });
+
+  describe("Send Ether", function() {
+    it("Contract balance should decrease by 0.0001", async function() {
+      const { wavePortalContract, otherAccount } = await loadFixture(deployWavePortalFixture);
+      const wavePortalContractAddress = await wavePortalContract.getAddress();
+      let contractBalance = await ethers.provider.getBalance(wavePortalContractAddress);
+
+      expect(contractBalance).to.equal(ethers.parseEther("0.1"));
+      await wavePortalContract.connect(otherAccount).wave("Testing");
+
+      contractBalance = await ethers.provider.getBalance(wavePortalContractAddress);
+      expect(contractBalance).to.equal(ethers.parseEther("0.0999"));
+    })
+  })
 
   describe("Correct Data", function() {
     it("Should Increase the Number of Waves", async function() {
