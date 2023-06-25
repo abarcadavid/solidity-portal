@@ -40,7 +40,7 @@ contract WavePortal {
         // There's a chance for a user that waved to receive some ether
         // Generate a seed to determine if user gets a prize
         seed = (block.timestamp * block.prevrandao) % 100;
-        if (seed <= 10) {
+        if (seed <= 90) {
             uint256 prizeAmount = 0.0001 ether;
             // Check if we have enough funds to give out prize money
             require(
