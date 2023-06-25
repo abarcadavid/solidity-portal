@@ -35,12 +35,13 @@ contract WavePortal {
 
         // There's a chance for a user that waved to receive some ether
         // Generate a seed to determine if user gets a prize
-        seed = (block.timestamp * block.prevrandao) % 100;
-        if (seed <= 90) {
+        seed = block.timestamp % 100;
+        console.log(seed);
+        if (seed <= 50) {
             uint256 prizeAmount = 0.0001 ether;
             // Check if we have enough funds to give out prize money
             require(
-                address(this).balance >= prizeAmount,
+                prizeAmount <= address(this).balance,
                 "Contract balance too low to give prize amount"
             );
 
