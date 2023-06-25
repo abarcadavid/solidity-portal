@@ -33,10 +33,6 @@ contract WavePortal {
         // Store the Wave into the Wave array
         waves.push((Wave(msg.sender, block.timestamp, _message)));
 
-        // After changing the blockchain, we will emit a signal to our frontend
-        // and let it know that the smart contract has updated it's state
-        emit newWave(msg.sender, block.timestamp, _message);
-
         // There's a chance for a user that waved to receive some ether
         // Generate a seed to determine if user gets a prize
         seed = (block.timestamp * block.prevrandao) % 100;
@@ -52,6 +48,10 @@ contract WavePortal {
             (bool success, ) = (msg.sender).call{value: prizeAmount}("");
             require(success, "Failed to withdraw money from contract.");
         }
+
+        // After changing the blockchain, we will emit a signal to our frontend
+        // and let it know that the smart contract has updated it's state
+        emit newWave(msg.sender, block.timestamp, _message);
     }
 
     function getWaves() public view returns (Wave[] memory) {
