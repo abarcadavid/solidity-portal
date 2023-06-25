@@ -17,7 +17,7 @@ const main = async () => {
 
   // Test wave() function. This should Increase Wave Count by 1,
   // In addition, waves = [{address, timestamp, message}]
-  const wavetxn = await waveContract.wave("hello world");
+  const wavetxn = await waveContract.wave("hello world", {gasLimit: 300000});
   await wavetxn.wait();
   const updatedContractBalance = await hre.ethers.provider.getBalance(waveContract.target);
   console.log('Contract Balance After Txn: ', hre.ethers.formatEther(updatedContractBalance));
